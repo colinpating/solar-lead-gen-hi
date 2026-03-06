@@ -23,7 +23,7 @@ export const leadCreateSchema = z.object({
     .string()
     .transform(cleanPhone)
     .refine((value) => value.length === 10, 'Phone must be 10 digits'),
-  best_time_to_contact: z.enum(['morning', 'afternoon', 'evening', 'anytime']),
+  best_time_to_contact: optionalEnum(['morning', 'afternoon', 'evening', 'anytime']),
   homeowner_status: optionalEnum(['owner', 'renter', 'other']),
   monthly_electric_bill_range: optionalEnum(['under_100', '100_199', '200_299', '300_499', '500_749', '750_1000']),
   roof_shade: optionalEnum(['none', 'some', 'heavy', 'unknown']),

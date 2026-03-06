@@ -19,6 +19,7 @@ export async function POST(request: Request) {
 
   const input = parsed.data;
   const consentAccepted = input.consent_combined;
+  const bestTimeToContact = input.best_time_to_contact ?? 'anytime';
   const dedupeSince = new Date(Date.now() - DEDUPE_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
 
   try {
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
           last_name: input.last_name,
           email: input.email,
           phone: input.phone,
-          best_time_to_contact: input.best_time_to_contact,
+          best_time_to_contact: bestTimeToContact,
           street_address: input.street_address,
           city: input.city,
           state: input.state,
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
             last_name: input.last_name,
             email: input.email,
             phone: input.phone,
-            best_time_to_contact: input.best_time_to_contact,
+            best_time_to_contact: bestTimeToContact,
             street_address: input.street_address,
             city: input.city,
             state: input.state,

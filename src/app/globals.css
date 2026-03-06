@@ -65,6 +65,11 @@ h1, h2, h3 {
   opacity: 0.8;
 }
 
+.required-mark {
+  color: #b42318;
+  font-weight: 700;
+}
+
 .lead-form,
 .admin-login,
 .legal-page,

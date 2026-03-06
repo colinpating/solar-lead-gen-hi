@@ -19,7 +19,7 @@ type FormState = {
   zip: string;
   email: string;
   phone: string;
-  best_time_to_contact: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  best_time_to_contact: '' | 'morning' | 'afternoon' | 'evening' | 'anytime';
   homeowner_status: '' | 'owner' | 'renter' | 'other';
   monthly_electric_bill_range: '' | 'under_100' | '100_199' | '200_299' | '300_499' | '500_749' | '750_1000';
   roof_shade: '' | 'none' | 'some' | 'heavy' | 'unknown';
@@ -40,7 +40,7 @@ const initialState: FormState = {
   zip: '',
   email: '',
   phone: '',
-  best_time_to_contact: 'anytime',
+  best_time_to_contact: '',
   homeowner_status: '',
   monthly_electric_bill_range: '',
   roof_shade: '',
@@ -133,6 +133,7 @@ export function LeadForm({ sectionId }: Props) {
     const payload = {
       ...form,
       phone: form.phone,
+      best_time_to_contact: form.best_time_to_contact || null,
       homeowner_status: form.homeowner_status || null,
       monthly_electric_bill_range: form.monthly_electric_bill_range || null,
       roof_shade: form.roof_shade || null,
@@ -174,16 +175,16 @@ export function LeadForm({ sectionId }: Props) {
       <h3>Get My Solar Quote</h3>
       <div className="grid two-col">
         <label>
-          First name
+          First name <span className="required-mark">*</span>
           <input required value={form.first_name} onChange={(e) => setForm((prev) => ({ ...prev, first_name: e.target.value }))} />
         </label>
         <label>
-          Last name
+          Last name <span className="required-mark">*</span>
           <input required value={form.last_name} onChange={(e) => setForm((prev) => ({ ...prev, last_name: e.target.value }))} />
         </label>
       </div>
       <label>
-        Street address
+        Street address <span className="required-mark">*</span>
         <input
           required
           value={form.street_address}
@@ -194,15 +195,15 @@ export function LeadForm({ sectionId }: Props) {
       {autofillHint ? <p className="fine-print">{autofillHint}</p> : null}
       <div className="grid three-col">
         <label>
-          City
+          City <span className="required-mark">*</span>
           <input required value={form.city} onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))} />
         </label>
         <label>
-          State
+          State <span className="required-mark">*</span>
           <input required value={form.state} readOnly />
         </label>
         <label>
-          Zip
+          Zip <span className="required-mark">*</span>
           <input
             required
             pattern="[0-9]{5}"
@@ -214,7 +215,7 @@ export function LeadForm({ sectionId }: Props) {
       </div>
       <div className="grid two-col">
         <label>
-          Email
+          Email <span className="required-mark">*</span>
           <input
             type="email"
             required
@@ -223,7 +224,7 @@ export function LeadForm({ sectionId }: Props) {
           />
         </label>
         <label>
-          Phone
+          Phone <span className="required-mark">*</span>
           <input
             required
             inputMode="tel"
@@ -236,10 +237,10 @@ export function LeadForm({ sectionId }: Props) {
         <label>
           Best time to contact
           <select
-            required
             value={form.best_time_to_contact}
             onChange={(e) => setForm((prev) => ({ ...prev, best_time_to_contact: e.target.value as FormState['best_time_to_contact'] }))}
           >
+            <option value="">No preference</option>
             <option value="morning">Morning</option>
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>
@@ -309,7 +310,7 @@ export function LeadForm({ sectionId }: Props) {
           required
         />
         <span>
-          {CONSENT_TEXT}{' '}
+          <span className="required-mark">*</span> {CONSENT_TEXT}{' '}
           <Link href="/privacy">Privacy Policy</Link> and <Link href="/terms">Terms</Link>.
         </span>
       </label>
