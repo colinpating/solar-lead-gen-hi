@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  if (path.startsWith('/api/admin')) {
+  if (path.startsWith('/api/admin') && path !== '/api/admin/login') {
     const headerToken = normalizeToken(
       request.headers.get('x-admin-token') || request.headers.get('authorization')?.replace('Bearer ', '') || request.cookies.get(ADMIN_COOKIE_NAME)?.value
     );

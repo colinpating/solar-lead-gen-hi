@@ -149,9 +149,19 @@ export function LeadForm({ sectionId }: Props) {
     });
 
     if (!response.ok) {
-      const body = (await response.json().catch(() => null)) as { error?: string } | null;
+      const body = (await response.json().catch(() => null)) as { error?: string; code?: string } | null;
       const serverError = body?.error && typeof body.error === 'string' ? body.error : null;
-      setError(serverError ?? `Unable to submit. Please verify fields and try again (status ${response.status}).`);
+      const serverCode = body?.code && typeof body.code === 'string' ? body.code : null;
+
+      if (serverError) {
+        setError(serverError);
+      } else if (serverCode === 'VALIDATION_ERROR') {
+        setError('Please review the highlighted fields and try again.');
+      } else if (serverCode === 'LEAD_CREATE_FAILED' || serverCode === 'CONSENT_LOG_FAILED' || serverCode === 'LEAD_INTAKE_ERROR') {
+        setError('We could not save your quote right now. Please try again in a moment.');
+      } else {
+        setError(`Unable to submit. Please verify fields and try again (status ${response.status}).`);
+      }
       setSubmitting(false);
       return;
     }
