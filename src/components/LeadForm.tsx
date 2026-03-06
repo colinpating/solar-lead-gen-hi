@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CONSENT_TEXT } from '@/lib/consent';
 import { SOLAR_PARTNERS } from '@/lib/partners';
@@ -27,6 +27,10 @@ type FormState = {
   consent_contact: boolean;
   consent_privacy: boolean;
 };
+
+type AutofillResponse =
+  | { ok: true; city: string; state: 'HI'; zip: string }
+  | { ok: false; reason: 'not_found' | 'non_hi' | 'error' };
 
 const initialState: FormState = {
   first_name: '',
@@ -56,9 +60,11 @@ function formatPhone(value: string): string {
 export function LeadForm({ sectionId }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const autofillTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [form, setForm] = useState<FormState>(initialState);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [autofillHint, setAutofillHint] = useState<string | null>(null);
 
   const utm = useMemo(
     () => ({
@@ -73,6 +79,54 @@ export function LeadForm({ sectionId }: Props) {
 
   const consentId = `consent-contact-${sectionId}`;
   const privacyId = `consent-privacy-${sectionId}`;
+
+  useEffect(() => {
+    return () => {
+      if (autofillTimerRef.current) clearTimeout(autofillTimerRef.current);
+    };
+  }, []);
+
+  function onStreetAddressBlur(value: string) {
+    const street = value.trim();
+    if (autofillTimerRef.current) clearTimeout(autofillTimerRef.current);
+    if (street.length < 6) {
+      setAutofillHint(null);
+      return;
+    }
+
+    autofillTimerRef.current = setTimeout(async () => {
+      try {
+        const response = await fetch('/api/address/autofill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ street_address: street })
+        });
+
+        if (!response.ok) {
+          setAutofillHint(null);
+          return;
+        }
+
+        const data = (await response.json().catch(() => null)) as AutofillResponse | null;
+        if (!data) return;
+
+        if (data.ok) {
+          setForm((prev) => ({ ...prev, city: data.city, state: data.state, zip: data.zip }));
+          setAutofillHint('Address matched. City, state, and ZIP were filled for Hawaii.');
+          return;
+        }
+
+        if (data.reason === 'non_hi') {
+          setAutofillHint('Only Hawaii addresses can be auto-filled.');
+          return;
+        }
+
+        setAutofillHint(null);
+      } catch {
+        setAutofillHint(null);
+      }
+    }, 250);
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -109,7 +163,7 @@ export function LeadForm({ sectionId }: Props) {
 
   return (
     <form className="lead-form" onSubmit={onSubmit}>
-      <h3>Get My Solar Estimate</h3>
+      <h3>Get My Solar Quote</h3>
       <div className="grid two-col">
         <label>
           First name
@@ -122,8 +176,14 @@ export function LeadForm({ sectionId }: Props) {
       </div>
       <label>
         Street address
-        <input required value={form.street_address} onChange={(e) => setForm((prev) => ({ ...prev, street_address: e.target.value }))} />
+        <input
+          required
+          value={form.street_address}
+          onChange={(e) => setForm((prev) => ({ ...prev, street_address: e.target.value }))}
+          onBlur={(e) => onStreetAddressBlur(e.target.value)}
+        />
       </label>
+      {autofillHint ? <p className="fine-print">{autofillHint}</p> : null}
       <div className="grid three-col">
         <label>
           City
@@ -261,7 +321,7 @@ export function LeadForm({ sectionId }: Props) {
       </label>
       {error ? <p className="error">{error}</p> : null}
       <button disabled={submitting} type="submit">
-        {submitting ? 'Submitting...' : 'Get My Solar Estimate'}
+        {submitting ? 'Submitting...' : 'Get My Solar Quote'}
       </button>
     </form>
   );

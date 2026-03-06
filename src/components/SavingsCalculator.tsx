@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { ScrollToButton } from '@/components/ScrollToButton';
 
 const HAWAII_RATE_PER_KWH = 0.40;
 const SOLAR_OFFSET_PERCENT = 0.85;
@@ -46,8 +47,8 @@ export function SavingsCalculator() {
   const results = calculate(bill);
 
   return (
-    <section className="savings-calc">
-      <h2>Estimate Your Solar Savings</h2>
+    <section id="savings-preview" className="savings-calc">
+      <h2>Preview Your Solar Savings</h2>
       <div className="calc-input-group">
         <label htmlFor="bill-slider">
           Monthly electric bill: <strong>${bill}</strong>
@@ -82,11 +83,11 @@ export function SavingsCalculator() {
         </div>
       </div>
       <p className="calc-disclaimer">
-        Estimates are for illustration only and assume ~$0.40/kWh HECO rate, 30% federal tax credit,
+        Preview values are for illustration only and assume ~$0.40/kWh HECO rate, 30% federal tax credit,
         5.5 peak sun hours, and 0.5% annual panel degradation. Actual savings depend on system design,
         roof orientation, shading, and utility rate changes.
       </p>
-      <a href="#lead-form-bottom" className="cta">Get My Personalized Estimate</a>
+      <ScrollToButton targetId="quote-form" className="cta">Get My Solar Quote</ScrollToButton>
     </section>
   );
 }
