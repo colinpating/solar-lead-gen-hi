@@ -19,10 +19,10 @@ export async function POST(request: Request) {
 
   const input = parsed.data;
   const consentAccepted = input.consent_combined;
-  const supabase = getSupabaseAdmin();
   const dedupeSince = new Date(Date.now() - DEDUPE_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
 
   try {
+    const supabase = getSupabaseAdmin();
     const { data: duplicateRows, error: dedupeError } = await supabase
       .from('leads')
       .select('id')
@@ -167,6 +167,13 @@ export async function POST(request: Request) {
     console.error('Lead intake failed', {
       error: error instanceof Error ? error.message : String(error)
     });
+    const message = error instanceof Error ? error.message : '';
+    if (message.includes('Missing required environment variable')) {
+      return NextResponse.json(
+        { code: 'BACKEND_CONFIG_ERROR', error: 'Quote submission is temporarily unavailable. Please try again shortly.' },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { code: 'LEAD_INTAKE_ERROR', error: 'We could not save your quote right now. Please try again.' },
       { status: 500 }

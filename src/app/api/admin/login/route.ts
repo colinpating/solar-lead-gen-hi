@@ -4,22 +4,32 @@ import { env } from '@/lib/env';
 import { ADMIN_COOKIE_NAME, normalizeToken } from '@/lib/adminAuth';
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => null)) as { token?: string } | null;
-  const submittedToken = normalizeToken(body?.token);
-  const expectedToken = normalizeToken(env.adminAccessToken);
+  try {
+    const body = (await request.json().catch(() => null)) as { token?: string } | null;
+    const submittedToken = normalizeToken(body?.token);
+    const expectedToken = normalizeToken(env.adminAccessToken);
 
-  if (!submittedToken || submittedToken !== expectedToken) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    if (!submittedToken || submittedToken !== expectedToken) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    const cookieStore = await cookies();
+    cookieStore.set(ADMIN_COOKIE_NAME, submittedToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 8
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('Admin login misconfigured', {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return NextResponse.json(
+      { code: 'ADMIN_CONFIG_ERROR', error: 'Admin login is temporarily unavailable. Please contact support.' },
+      { status: 500 }
+    );
   }
-
-  const cookieStore = await cookies();
-  cookieStore.set(ADMIN_COOKIE_NAME, submittedToken, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: 60 * 60 * 8
-  });
-
-  return NextResponse.json({ ok: true });
 }
