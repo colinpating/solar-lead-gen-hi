@@ -40,6 +40,12 @@ export type LeadRow = {
   home_value_estimate: number | null;
   home_value_estimate_method: string | null;
   enrichment_status: string | null;
+  square_footage: number | null;
+  year_built: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  lot_size: number | null;
+  rentcast_value_estimate: number | null;
   enrichment_raw_payload: unknown;
 };
 

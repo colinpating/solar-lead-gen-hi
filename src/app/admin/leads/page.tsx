@@ -70,7 +70,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                 <td>
                   {row.enrichment_status ?? '-'}
                   <br />
-                  {row.home_value_estimate ? `$${row.home_value_estimate.toLocaleString()}` : 'No value proxy'}
+                  {row.home_value_estimate ? `Tract: $${row.home_value_estimate.toLocaleString()}` : 'No tract value'}
+                  {row.rentcast_value_estimate ? ` | Property: $${row.rentcast_value_estimate.toLocaleString()}` : ''}
                   <details>
                     <summary>Details</summary>
                     <div>
@@ -82,6 +83,10 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                       <div>County: {row.county ?? '-'}</div>
                       <div>Property type: {row.property_type ?? '-'}</div>
                       <div>Last sale date: {row.last_sale_date ?? '-'}</div>
+                      <div>Sq ft: {row.square_footage ?? '-'}</div>
+                      <div>Year built: {row.year_built ?? '-'}</div>
+                      <div>Beds/Baths: {row.bedrooms ?? '-'}/{row.bathrooms ?? '-'}</div>
+                      <div>Lot size: {row.lot_size ?? '-'}</div>
                     </div>
                   </details>
                 </td>

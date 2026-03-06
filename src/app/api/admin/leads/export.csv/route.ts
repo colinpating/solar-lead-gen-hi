@@ -51,6 +51,12 @@ export async function GET(request: Request) {
     'last_sale_date',
     'home_value_estimate',
     'home_value_estimate_method',
+    'rentcast_value_estimate',
+    'square_footage',
+    'year_built',
+    'bedrooms',
+    'bathrooms',
+    'lot_size',
     'enrichment_status',
     'enrichment_disclaimer'
   ];
@@ -95,8 +101,14 @@ export async function GET(request: Request) {
       row.last_sale_date,
       row.home_value_estimate,
       row.home_value_estimate_method,
+      row.rentcast_value_estimate,
+      row.square_footage,
+      row.year_built,
+      row.bedrooms,
+      row.bathrooms,
+      row.lot_size,
       row.enrichment_status,
-      'Home value is a tract-level proxy, not an address-level AVM.'
+      'home_value_estimate is Census tract median; rentcast_value_estimate is property-level from RentCast.'
     ]
       .map(csvEscape)
       .join(',');

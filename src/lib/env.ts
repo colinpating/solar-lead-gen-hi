@@ -14,5 +14,6 @@ export const env = {
   adminAccessToken: required('ADMIN_ACCESS_TOKEN'),
   internalEnrichToken: required('INTERNAL_ENRICH_TOKEN'),
   censusApiKey: process.env.CENSUS_API_KEY,
-  censusAcsYear: process.env.CENSUS_ACS_YEAR ?? '2023'
+  censusAcsYear: process.env.CENSUS_ACS_YEAR ?? '2023',
+  rentcastApiKey: process.env.RENTCAST_API_KEY
 };

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CONSENT_TEXT } from '@/lib/consent';
+import { SOLAR_PARTNERS } from '@/lib/partners';
 
 type Props = {
   sectionId: string;
@@ -238,6 +239,14 @@ export function LeadForm({ sectionId }: Props) {
         />
         <span>{CONSENT_TEXT}</span>
       </label>
+      <details className="partner-disclosure">
+        <summary>View Marketing Partners</summary>
+        <ul>
+          {SOLAR_PARTNERS.map((p) => (
+            <li key={p.name}>{p.name}</li>
+          ))}
+        </ul>
+      </details>
       <label htmlFor={privacyId} className="checkbox-row">
         <input
           id={privacyId}

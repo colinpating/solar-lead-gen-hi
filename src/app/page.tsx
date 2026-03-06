@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { LeadForm } from '@/components/LeadForm';
+import { SavingsCalculator } from '@/components/SavingsCalculator';
+import { SocialProof } from '@/components/SocialProof';
 
 export default function HomePage() {
   return (
@@ -18,6 +20,8 @@ export default function HomePage() {
         </div>
         <LeadForm sectionId="top" />
       </section>
+
+      <SavingsCalculator />
 
       <section className="trust-strip">
         <p>Licensed installer network</p>
@@ -43,6 +47,8 @@ export default function HomePage() {
           </ol>
         </article>
       </section>
+
+      <SocialProof />
 
       <section className="faq">
         <h2>FAQ</h2>
