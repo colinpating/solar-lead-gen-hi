@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { LeadForm } from '@/components/LeadForm';
 import { SavingsCalculator } from '@/components/SavingsCalculator';
 import { SocialProof } from '@/components/SocialProof';
@@ -18,7 +19,9 @@ export default function HomePage() {
           </a>
           <p className="fine-print">Tax credit availability varies by eligibility and filing status.</p>
         </div>
-        <LeadForm sectionId="top" />
+        <Suspense fallback={<div className="lead-form">Loading form...</div>}>
+          <LeadForm sectionId="top" />
+        </Suspense>
       </section>
 
       <SavingsCalculator />
@@ -67,7 +70,9 @@ export default function HomePage() {
       </section>
 
       <section id="lead-form-bottom" className="bottom-form">
-        <LeadForm sectionId="bottom" />
+        <Suspense fallback={<div className="lead-form">Loading form...</div>}>
+          <LeadForm sectionId="bottom" />
+        </Suspense>
       </section>
 
       <footer>
