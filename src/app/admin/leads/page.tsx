@@ -4,6 +4,50 @@ import { getAdminLeadRows } from '@/lib/leadQueries';
 
 type SearchParams = Promise<{ page?: string; zip?: string; lead_status?: string; homeowner_status?: string }>;
 
+const HST_TIMEZONE = 'Pacific/Honolulu';
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: HST_TIMEZONE,
+  month: '2-digit',
+  day: '2-digit',
+  year: 'numeric'
+});
+
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: HST_TIMEZONE,
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true
+});
+
+function formatBillRange(value: string | null): string {
+  if (!value) return '-';
+  const map: Record<string, string> = {
+    under_100: 'Under $100',
+    '100_199': '$100-$199',
+    '200_299': '$200-$299',
+    '300_499': '$300-$499',
+    '500_749': '$500-$749',
+    '750_1000': '$750-$1000'
+  };
+  return map[value] ?? value.replace(/_/g, '-');
+}
+
+function formatTimeline(value: string | null): string {
+  if (!value) return '-';
+  const map: Record<string, string> = {
+    '0_3_months': '0-3 months',
+    '3_6_months': '3-6 months',
+    '6_plus_months': '6+ months'
+  };
+  return map[value] ?? value.replace(/_/g, ' ');
+}
+
+function formatStatus(value: string | null): string {
+  if (!value) return '-';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export default async function AdminLeadsPage({ searchParams }: { searchParams: SearchParams }) {
   const authenticated = await isAdminAuthenticated();
   if (!authenticated) redirect('/admin/login');
@@ -35,7 +79,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
         <table>
           <thead>
             <tr>
-              <th>Created</th>
+              <th>Date Submitted (HST)</th>
+              <th>Time Submitted (HST)</th>
               <th>Name</th>
               <th>Phone</th>
               <th>Email</th>
@@ -52,7 +97,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>{new Date(row.created_at).toLocaleString()}</td>
+                <td>{dateFormatter.format(new Date(row.created_at))}</td>
+                <td>{timeFormatter.format(new Date(row.created_at))}</td>
                 <td>
                   {row.first_name} {row.last_name}
                 </td>
@@ -61,14 +107,14 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                 <td>
                   {row.street_address}, {row.city}, {row.state} {row.zip}
                 </td>
-                <td>{row.best_time_to_contact}</td>
+                <td>{formatStatus(row.best_time_to_contact)}</td>
                 <td>{row.homeowner_status ?? '-'}</td>
-                <td>{row.monthly_electric_bill_range ?? '-'}</td>
-                <td>{row.timeline_to_install ?? '-'}</td>
-                <td>{row.lead_status}</td>
+                <td>{formatBillRange(row.monthly_electric_bill_range)}</td>
+                <td>{formatTimeline(row.timeline_to_install)}</td>
+                <td>{formatStatus(row.lead_status)}</td>
                 <td>{row.consent_contact && row.consent_privacy ? 'Yes' : 'No'}</td>
                 <td>
-                  {row.enrichment_status ?? '-'}
+                  {formatStatus(row.enrichment_status)}
                   <br />
                   {row.home_value_estimate ? `Tract: $${row.home_value_estimate.toLocaleString()}` : 'No tract value'}
                   {row.rentcast_value_estimate ? ` | Property: $${row.rentcast_value_estimate.toLocaleString()}` : ''}
