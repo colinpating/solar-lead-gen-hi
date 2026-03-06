@@ -178,7 +178,15 @@ export async function runEnrichmentForLead(leadId: string): Promise<void> {
       // Geocode failed but still try RentCast for property data
       const rentcast = await lookupRentCastProperty(address);
       rentcastRaw = rentcast.raw;
-      const hasRentCastData = !!(rentcast.propertyType || rentcast.valueEstimate || rentcast.squareFootage || rentcast.bedrooms);
+      const hasRentCastData =
+        rentcast.propertyType != null ||
+        rentcast.lastSaleDate != null ||
+        rentcast.valueEstimate != null ||
+        rentcast.squareFootage != null ||
+        rentcast.yearBuilt != null ||
+        rentcast.bedrooms != null ||
+        rentcast.bathrooms != null ||
+        rentcast.lotSize != null;
       enrichmentStatus = hasRentCastData ? 'partial' : 'failed';
       await supabase.from('lead_enrichment').upsert({
         lead_id: leadId,
