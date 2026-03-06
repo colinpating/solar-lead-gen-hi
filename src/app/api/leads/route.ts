@@ -5,8 +5,6 @@ import { leadCreateSchema } from '@/lib/validation';
 import { getClientIp, toNullableString } from '@/lib/utils';
 import { runEnrichmentForLead } from '@/lib/enrichment';
 
-const DEDUPE_WINDOW_HOURS = 24;
-
 export async function POST(request: Request) {
   const parsed = leadCreateSchema.safeParse(await request.json().catch(() => null));
 
@@ -20,24 +18,11 @@ export async function POST(request: Request) {
   const input = parsed.data;
   const consentAccepted = input.consent_combined;
   const bestTimeToContact = input.best_time_to_contact ?? 'anytime';
-  const dedupeSince = new Date(Date.now() - DEDUPE_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
 
   try {
     const supabase = getSupabaseAdmin();
-    const { data: duplicateRows, error: dedupeError } = await supabase
-      .from('leads')
-      .select('id')
-      .or(`email.eq.${input.email},phone.eq.${input.phone}`)
-      .gte('created_at', dedupeSince)
-      .limit(1);
-
-    if (dedupeError) {
-      throw dedupeError;
-    }
-
     const ipAddress = getClientIp(request.headers);
-    const leadId = duplicateRows?.[0]?.id ?? null;
-    let finalLeadId = leadId;
+    let finalLeadId: string | null = null;
 
     const consentPayload = {
       consent_contact: consentAccepted,
@@ -137,19 +122,6 @@ export async function POST(request: Request) {
           console.error('Enrichment seed fallback failed', { enrichmentSeedError: enrichmentSeedError.message });
         }
       }
-    } else {
-      const { error: consentInsertError } = await supabase.from('lead_consent_events').insert({
-        lead_id: finalLeadId,
-        ...consentPayload
-      });
-
-      if (consentInsertError) {
-        console.error('Consent insert failed for deduped lead', { consentInsertError: consentInsertError.message });
-        return NextResponse.json(
-          { code: 'CONSENT_LOG_FAILED', error: 'We could not save your quote right now. Please try again.' },
-          { status: 500 }
-        );
-      }
     }
 
     if (!finalLeadId) {
@@ -169,7 +141,7 @@ export async function POST(request: Request) {
       // Enrichment failures are non-blocking for lead intake.
     }
 
-    return NextResponse.json({ lead_id: finalLeadId, deduped: Boolean(leadId) }, { status: 201 });
+    return NextResponse.json({ lead_id: finalLeadId, deduped: false }, { status: 201 });
   } catch (error) {
     console.error('Lead intake failed', {
       error: error instanceof Error ? error.message : String(error)
