@@ -17,7 +17,7 @@ export function AdminLoginForm() {
     const response = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
+      body: JSON.stringify({ token: token.trim() })
     });
 
     if (!response.ok) {
