@@ -68,6 +68,7 @@ h1, h2, h3 {
 .required-mark {
   color: #b42318;
   font-weight: 700;
+  line-height: 1;
 }
 
 .lead-form,
@@ -99,6 +100,12 @@ label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 input,
@@ -418,5 +425,21 @@ td {
   .testimonial-grid,
   .social-proof .trust-strip {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .lead-form {
+    padding: 0.9rem;
+  }
+
+  input,
+  select,
+  button {
+    min-height: 44px;
+  }
+
+  .lead-form button {
+    width: 100%;
   }
 }

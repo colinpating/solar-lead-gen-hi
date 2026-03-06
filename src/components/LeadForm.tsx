@@ -175,16 +175,16 @@ export function LeadForm({ sectionId }: Props) {
       <h3>Get My Solar Quote</h3>
       <div className="grid two-col">
         <label>
-          First name <span className="required-mark">*</span>
+          <span className="field-label">First name<span className="required-mark">*</span></span>
           <input required value={form.first_name} onChange={(e) => setForm((prev) => ({ ...prev, first_name: e.target.value }))} />
         </label>
         <label>
-          Last name <span className="required-mark">*</span>
+          <span className="field-label">Last name<span className="required-mark">*</span></span>
           <input required value={form.last_name} onChange={(e) => setForm((prev) => ({ ...prev, last_name: e.target.value }))} />
         </label>
       </div>
       <label>
-        Street address <span className="required-mark">*</span>
+        <span className="field-label">Street address<span className="required-mark">*</span></span>
         <input
           required
           value={form.street_address}
@@ -195,15 +195,15 @@ export function LeadForm({ sectionId }: Props) {
       {autofillHint ? <p className="fine-print">{autofillHint}</p> : null}
       <div className="grid three-col">
         <label>
-          City <span className="required-mark">*</span>
+          <span className="field-label">City<span className="required-mark">*</span></span>
           <input required value={form.city} onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))} />
         </label>
         <label>
-          State <span className="required-mark">*</span>
+          <span className="field-label">State<span className="required-mark">*</span></span>
           <input required value={form.state} readOnly />
         </label>
         <label>
-          Zip <span className="required-mark">*</span>
+          <span className="field-label">Zip<span className="required-mark">*</span></span>
           <input
             required
             pattern="[0-9]{5}"
@@ -215,7 +215,7 @@ export function LeadForm({ sectionId }: Props) {
       </div>
       <div className="grid two-col">
         <label>
-          Email <span className="required-mark">*</span>
+          <span className="field-label">Email<span className="required-mark">*</span></span>
           <input
             type="email"
             required
@@ -224,7 +224,7 @@ export function LeadForm({ sectionId }: Props) {
           />
         </label>
         <label>
-          Phone <span className="required-mark">*</span>
+          <span className="field-label">Phone<span className="required-mark">*</span></span>
           <input
             required
             inputMode="tel"
