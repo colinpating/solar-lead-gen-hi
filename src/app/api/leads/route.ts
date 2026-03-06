@@ -158,9 +158,15 @@ export async function POST(request: Request) {
       );
     }
 
-    void runEnrichmentForLead(finalLeadId).catch(() => {
+    try {
+      await runEnrichmentForLead(finalLeadId);
+    } catch (enrichmentError) {
+      console.error('Enrichment failed after lead intake', {
+        leadId: finalLeadId,
+        error: enrichmentError instanceof Error ? enrichmentError.message : String(enrichmentError)
+      });
       // Enrichment failures are non-blocking for lead intake.
-    });
+    }
 
     return NextResponse.json({ lead_id: finalLeadId, deduped: Boolean(leadId) }, { status: 201 });
   } catch (error) {
