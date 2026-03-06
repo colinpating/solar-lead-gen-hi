@@ -21,11 +21,10 @@ type FormState = {
   phone: string;
   best_time_to_contact: 'morning' | 'afternoon' | 'evening' | 'anytime';
   homeowner_status: '' | 'owner' | 'renter' | 'other';
-  monthly_electric_bill_range: '' | 'under_100' | '100_199' | '200_299' | '300_plus';
+  monthly_electric_bill_range: '' | 'under_100' | '100_199' | '200_299' | '300_499' | '500_749' | '750_1000';
   roof_shade: '' | 'none' | 'some' | 'heavy' | 'unknown';
   timeline_to_install: '' | '0_3_months' | '3_6_months' | '6_plus_months';
-  consent_contact: boolean;
-  consent_privacy: boolean;
+  consent_combined: boolean;
 };
 
 type AutofillResponse =
@@ -46,8 +45,7 @@ const initialState: FormState = {
   monthly_electric_bill_range: '',
   roof_shade: '',
   timeline_to_install: '',
-  consent_contact: false,
-  consent_privacy: false
+  consent_combined: false
 };
 
 function formatPhone(value: string): string {
@@ -77,8 +75,7 @@ export function LeadForm({ sectionId }: Props) {
     [searchParams]
   );
 
-  const consentId = `consent-contact-${sectionId}`;
-  const privacyId = `consent-privacy-${sectionId}`;
+  const consentId = `consent-combined-${sectionId}`;
 
   useEffect(() => {
     return () => {
@@ -112,7 +109,7 @@ export function LeadForm({ sectionId }: Props) {
 
         if (data.ok) {
           setForm((prev) => ({ ...prev, city: data.city, state: data.state, zip: data.zip }));
-          setAutofillHint('Address matched. City, state, and ZIP were filled for Hawaii.');
+          setAutofillHint(null);
           return;
         }
 
@@ -152,8 +149,9 @@ export function LeadForm({ sectionId }: Props) {
     });
 
     if (!response.ok) {
-      const body = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(body.error ?? 'Unable to submit. Please verify fields and try again.');
+      const body = (await response.json().catch(() => null)) as { error?: string } | null;
+      const serverError = body?.error && typeof body.error === 'string' ? body.error : null;
+      setError(serverError ?? `Unable to submit. Please verify fields and try again (status ${response.status}).`);
       setSubmitting(false);
       return;
     }
@@ -201,6 +199,7 @@ export function LeadForm({ sectionId }: Props) {
             value={form.zip}
             onChange={(e) => setForm((prev) => ({ ...prev, zip: e.target.value.replace(/\D/g, '').slice(0, 5) }))}
           />
+          <span className="fine-print">Hawaii ZIPs only (96701-96898).</span>
         </label>
       </div>
       <div className="grid two-col">
@@ -263,7 +262,9 @@ export function LeadForm({ sectionId }: Props) {
             <option value="under_100">Under $100</option>
             <option value="100_199">$100-$199</option>
             <option value="200_299">$200-$299</option>
-            <option value="300_plus">$300+</option>
+            <option value="300_499">$300-$499</option>
+            <option value="500_749">$500-$749</option>
+            <option value="750_1000">$750-$1000</option>
           </select>
         </label>
         <label>
@@ -293,11 +294,14 @@ export function LeadForm({ sectionId }: Props) {
         <input
           id={consentId}
           type="checkbox"
-          checked={form.consent_contact}
-          onChange={(e) => setForm((prev) => ({ ...prev, consent_contact: e.target.checked }))}
+          checked={form.consent_combined}
+          onChange={(e) => setForm((prev) => ({ ...prev, consent_combined: e.target.checked }))}
           required
         />
-        <span>{CONSENT_TEXT}</span>
+        <span>
+          {CONSENT_TEXT}{' '}
+          <Link href="/privacy">Privacy Policy</Link> and <Link href="/terms">Terms</Link>.
+        </span>
       </label>
       <details className="partner-disclosure">
         <summary>View Marketing Partners</summary>
@@ -307,18 +311,6 @@ export function LeadForm({ sectionId }: Props) {
           ))}
         </ul>
       </details>
-      <label htmlFor={privacyId} className="checkbox-row">
-        <input
-          id={privacyId}
-          type="checkbox"
-          checked={form.consent_privacy}
-          onChange={(e) => setForm((prev) => ({ ...prev, consent_privacy: e.target.checked }))}
-          required
-        />
-        <span>
-          I agree to the <Link href="/privacy">Privacy Policy</Link> and <Link href="/terms">Terms</Link>.
-        </span>
-      </label>
       {error ? <p className="error">{error}</p> : null}
       <button disabled={submitting} type="submit">
         {submitting ? 'Submitting...' : 'Get My Solar Quote'}

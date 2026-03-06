@@ -32,9 +32,8 @@ main {
   align-items: start;
 }
 
-.hero-single {
-  grid-template-columns: 1fr;
-  max-width: 760px;
+.hero .savings-calc {
+  margin: 0;
 }
 
 .eyebrow {
@@ -234,6 +233,34 @@ td {
   padding: 1.5rem;
   margin: 1.25rem 0;
   text-align: center;
+}
+
+.savings-calc--compact {
+  padding: 1rem;
+  text-align: left;
+}
+
+.savings-calc--compact .calc-input-group {
+  max-width: none;
+  margin: 0 0 1rem;
+}
+
+.savings-calc--compact .calc-results {
+  grid-template-columns: 1fr;
+}
+
+.savings-calc--compact .stat-card {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.savings-calc--compact .stat-value {
+  font-size: 1.2rem;
+}
+
+.savings-calc--compact .calc-disclaimer {
+  margin: 0 0 0.8rem;
 }
 
 .savings-calc h2 {

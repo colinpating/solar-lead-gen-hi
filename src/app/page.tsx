@@ -7,7 +7,7 @@ import { ScrollToButton } from '@/components/ScrollToButton';
 export default function HomePage() {
   return (
     <main>
-      <section className="hero hero-single">
+      <section className="hero">
         <div>
           <p className="eyebrow">Hawaii Homeowners</p>
           <h1>Cut power bills with a local solar quote in minutes.</h1>
@@ -19,9 +19,8 @@ export default function HomePage() {
           </ScrollToButton>
           <p className="fine-print">Tax credit availability varies by eligibility and filing status.</p>
         </div>
+        <SavingsCalculator compact />
       </section>
-
-      <SavingsCalculator />
       
       <section id="quote-form" className="bottom-form">
         <Suspense fallback={<div className="lead-form">Loading form...</div>}>

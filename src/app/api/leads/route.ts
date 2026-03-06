@@ -15,6 +15,7 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  const consentAccepted = input.consent_combined;
   const supabase = getSupabaseAdmin();
   const dedupeSince = new Date(Date.now() - DEDUPE_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
 
@@ -48,8 +49,8 @@ export async function POST(request: Request) {
         timeline_to_install: input.timeline_to_install
       },
       p_consent: {
-        consent_contact: input.consent_contact,
-        consent_privacy: input.consent_privacy,
+        consent_contact: consentAccepted,
+        consent_privacy: consentAccepted,
         consent_text_version: CONSENT_TEXT_VERSION,
         consent_text_rendered: CONSENT_TEXT,
         consent_timestamp: new Date().toISOString(),
@@ -73,8 +74,8 @@ export async function POST(request: Request) {
   } else {
     await supabase.from('lead_consent_events').insert({
       lead_id: finalLeadId,
-      consent_contact: input.consent_contact,
-      consent_privacy: input.consent_privacy,
+      consent_contact: consentAccepted,
+      consent_privacy: consentAccepted,
       consent_text_version: CONSENT_TEXT_VERSION,
       consent_text_rendered: CONSENT_TEXT,
       consent_timestamp: new Date().toISOString(),
