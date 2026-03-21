@@ -25,6 +25,9 @@ export const env = {
   get internalEnrichToken() {
     return required('INTERNAL_ENRICH_TOKEN');
   },
+  get keepaliveToken() {
+    return process.env.KEEPALIVE_TOKEN;
+  },
   get censusApiKey() {
     return process.env.CENSUS_API_KEY;
   },

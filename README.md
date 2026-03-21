@@ -37,6 +37,7 @@ Next.js + Supabase app for Hawaii solar lead capture with strict consent evidenc
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ADMIN_ACCESS_TOKEN`
 - `INTERNAL_ENRICH_TOKEN`
+- Optional: `KEEPALIVE_TOKEN` (recommended for protecting `/api/health`)
 - Optional: `CENSUS_API_KEY`
 - Optional: `CENSUS_ACS_YEAR` (default `2023`)
 
@@ -47,10 +48,22 @@ Next.js + Supabase app for Hawaii solar lead capture with strict consent evidenc
 - `/thank-you` submit success page
 - `/api/leads` create lead + consent event
 - `/api/enrich/:leadId` internal enrichment endpoint (requires `x-internal-token`)
+- `/api/health` keepalive + healthcheck endpoint (optionally protected by `x-keepalive-token` or `?token=`)
 - `/admin/login` admin login (token based)
 - `/admin/leads` admin lead table
 - `/api/admin/leads` JSON list API (auth required)
 - `/api/admin/leads/export.csv` CSV export (auth required)
+
+## Keeping Supabase Warm on the Free Tier
+If you want to reduce the odds of a free Supabase project pausing from inactivity, you can ping the app periodically.
+
+1. Set `NEXT_PUBLIC_APP_URL` to your deployed app URL.
+2. Set `KEEPALIVE_TOKEN` to a random secret.
+3. Hit the health endpoint on a schedule, for example:
+   - `curl -fsS -H "x-keepalive-token: $KEEPALIVE_TOKEN" "$NEXT_PUBLIC_APP_URL/api/health"`
+4. Run that every few hours from a cron service or OpenClaw cron job.
+
+This is a workaround, not a hard guarantee. If Supabase changes free-tier pause behavior, upgrading is still the real fix.
 
 ## Notes
 - Home value output is a tract-level proxy, not an address-level AVM/Zestimate.
